@@ -34,7 +34,7 @@
         <!--       Plugins       -->
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <avro-maven-plugin.version>${avro.version}</avro-maven-plugin.version>
-        <protobuf-plugin.version>2.4.0</protobuf-plugin.version>
+        <protobuf-plugin.version>3.10.2</protobuf-plugin.version>
     </properties>
 
     <dependencyManagement>
