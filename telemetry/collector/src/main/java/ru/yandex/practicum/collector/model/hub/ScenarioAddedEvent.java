@@ -1,5 +1,7 @@
 package ru.yandex.practicum.collector.model.hub;
 
+import ru.yandex.practicum.collector.model.enumeration.*;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
