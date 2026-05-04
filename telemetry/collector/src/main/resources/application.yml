@@ -7,8 +7,9 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: ru.yandex.practicum.collector.kafka.AvroSerializer
 
-server:
-  port: 8080
+grpc:
+  server:
+    port: 9090
 
 kafka:
   topics:
