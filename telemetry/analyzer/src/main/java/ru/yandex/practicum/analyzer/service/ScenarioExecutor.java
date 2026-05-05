@@ -61,10 +61,10 @@ public class ScenarioExecutor {
 
     private List<Scenario> findScenarios(String hubId) {
         sleepBeforeRetry();
-        List<Scenario> scenarios = scenarioRepository.findByHubId(hubId);
+        List<Scenario> scenarios = scenarioRepository.findByHubIdWithDetails(hubId);
         for (int attempt = 0; scenarios.isEmpty() && attempt < 5; attempt++) {
             sleepBeforeRetry();
-            scenarios = scenarioRepository.findByHubId(hubId);
+            scenarios = scenarioRepository.findByHubIdWithDetails(hubId);
         }
         return scenarios;
     }

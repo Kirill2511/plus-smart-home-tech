@@ -25,11 +25,11 @@ public class Condition {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private ConditionTypeAvro type;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private ConditionOperationAvro operation;
 
     @Column(name = "value")

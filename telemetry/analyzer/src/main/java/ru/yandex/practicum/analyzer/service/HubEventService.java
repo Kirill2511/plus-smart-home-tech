@@ -21,6 +21,11 @@ import ru.yandex.practicum.kafka.telemetry.event.ScenarioConditionAvro;
 import ru.yandex.practicum.kafka.telemetry.event.ScenarioRemovedEventAvro;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -50,36 +55,53 @@ public class HubEventService {
     private void saveScenario(String hubId, ScenarioAddedEventAvro event) {
         Scenario scenario = scenarioRepository.findByHubIdAndName(hubId, event.getName())
                 .orElseGet(() -> new Scenario(hubId, event.getName()));
+        Map<String, Sensor> sensors = loadSensors(hubId, event);
 
-        scenario.replaceConditions(toConditions(hubId, event.getConditions()));
-        scenario.replaceActions(toActions(hubId, event.getActions()));
+        scenario.replaceConditions(toConditions(hubId, sensors, event.getConditions()));
+        scenario.replaceActions(toActions(hubId, sensors, event.getActions()));
 
         scenarioRepository.save(scenario);
         log.info("Сохранён сценарий {} для хаба {}", event.getName(), hubId);
     }
 
-    private List<ScenarioCondition> toConditions(String hubId, List<ScenarioConditionAvro> conditions) {
+    private Map<String, Sensor> loadSensors(String hubId, ScenarioAddedEventAvro event) {
+        Set<String> sensorIds = Stream.concat(
+                        event.getConditions().stream().map(ScenarioConditionAvro::getSensorId),
+                        event.getActions().stream().map(DeviceActionAvro::getSensorId))
+                .collect(Collectors.toSet());
+
+        return sensorRepository.findByIdInAndHubId(sensorIds, hubId).stream()
+                .collect(Collectors.toMap(Sensor::getId, Function.identity()));
+    }
+
+    private List<ScenarioCondition> toConditions(String hubId,
+                                                 Map<String, Sensor> sensors,
+                                                 List<ScenarioConditionAvro> conditions) {
         return conditions.stream()
                 .map(condition -> {
                     Object value = condition.getValue();
                     Integer conditionValue = value instanceof Boolean bool ? (bool ? 1 : 0) : (Integer) value;
-                    Sensor sensor = sensorRepository.findByIdAndHubId(condition.getSensorId(), hubId)
-                            .orElseThrow(() -> new IllegalArgumentException(
-                                    "Не найден датчик " + condition.getSensorId() + " для хаба " + hubId));
+                    Sensor sensor = getSensor(sensors, condition.getSensorId(), hubId);
                     return new ScenarioCondition(sensor,
                             new Condition(condition.getType(), condition.getOperation(), conditionValue));
                 })
                 .toList();
     }
 
-    private List<ScenarioAction> toActions(String hubId, List<DeviceActionAvro> actions) {
+    private List<ScenarioAction> toActions(String hubId, Map<String, Sensor> sensors, List<DeviceActionAvro> actions) {
         return actions.stream()
                 .map(action -> {
-                    Sensor sensor = sensorRepository.findByIdAndHubId(action.getSensorId(), hubId)
-                            .orElseThrow(() -> new IllegalArgumentException(
-                                    "Не найден датчик " + action.getSensorId() + " для хаба " + hubId));
+                    Sensor sensor = getSensor(sensors, action.getSensorId(), hubId);
                     return new ScenarioAction(sensor, new Action(action.getType(), action.getValue()));
                 })
                 .toList();
+    }
+
+    private Sensor getSensor(Map<String, Sensor> sensors, String sensorId, String hubId) {
+        Sensor sensor = sensors.get(sensorId);
+        if (sensor == null) {
+            throw new IllegalArgumentException("Не найден датчик " + sensorId + " для хаба " + hubId);
+        }
+        return sensor;
     }
 }

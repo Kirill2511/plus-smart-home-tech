@@ -13,8 +13,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "scenarios", uniqueConstraints = @UniqueConstraint(columnNames = {"hub_id", "name"}))
@@ -26,17 +27,17 @@ public class Scenario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "hub_id", nullable = false)
+    @Column(name = "hub_id", nullable = false, length = 100)
     private String hubId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String name;
 
     @OneToMany(mappedBy = "scenario", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ScenarioCondition> conditions = new ArrayList<>();
+    private Set<ScenarioCondition> conditions = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "scenario", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ScenarioAction> actions = new ArrayList<>();
+    private Set<ScenarioAction> actions = new LinkedHashSet<>();
 
     public Scenario(String hubId, String name) {
         this.hubId = hubId;

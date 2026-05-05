@@ -17,8 +17,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Sensor {
     @Id
+    @Column(length = 100)
     private String id;
 
-    @Column(nullable = false)
+    @Column(name = "hub_id", nullable = false, length = 100)
     private String hubId;
 }

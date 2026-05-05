@@ -20,7 +20,7 @@ public class ScenarioConditionId implements Serializable {
     @Column(name = "scenario_id")
     private Long scenarioId;
 
-    @Column(name = "sensor_id")
+    @Column(name = "sensor_id", length = 100)
     private String sensorId;
 
     @Column(name = "condition_id")
