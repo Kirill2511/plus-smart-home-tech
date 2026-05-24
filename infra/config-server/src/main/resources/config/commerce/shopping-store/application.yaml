@@ -1,0 +1,16 @@
+server:
+  port: 0
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/shopping_store
+    driver-class-name: org.postgresql.Driver
+    username: shopping_store
+    password: shopping_store
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true

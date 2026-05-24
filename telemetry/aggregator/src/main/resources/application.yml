@@ -2,18 +2,28 @@ spring:
   application:
     name: aggregator
   config:
-    import: "configserver:"
+    import: "optional:configserver:http://localhost:8888"
   cloud:
     config:
-      fail-fast: true
+      fail-fast: false
       discovery:
-        enabled: true
-        serviceId: config-server
+        enabled: false
       retry:
         use-random-policy: true
         max-interval: 6000
 
+aggregator:
+  kafka:
+    bootstrap-servers: localhost:9092
+    topics:
+      sensors: telemetry.sensors.v1
+      snapshots: telemetry.snapshots.v1
+    consumer:
+      group-id: aggregator
+      poll-timeout: 1000
+
 eureka:
   client:
+    enabled: false
     serviceUrl:
       defaultZone: http://${eureka.instance.hostname:localhost}:${eureka.instance.port:8761}/eureka/
