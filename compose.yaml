@@ -1,4 +1,68 @@
 services:
+  analyzer-db:
+    image: postgres:18-alpine
+    container_name: analyzer-db
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: analyzer
+      POSTGRES_USER: analyzer
+      POSTGRES_PASSWORD: analyzer
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U analyzer -d analyzer"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  shopping-store-db:
+    image: postgres:18-alpine
+    container_name: shopping-store-db
+    ports:
+      - "5433:5432"
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: shopping_store
+      POSTGRES_USER: shopping_store
+      POSTGRES_PASSWORD: shopping_store
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shopping_store -d shopping_store"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  shopping-cart-db:
+    image: postgres:18-alpine
+    container_name: shopping-cart-db
+    ports:
+      - "5434:5432"
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: shopping_cart
+      POSTGRES_USER: shopping_cart
+      POSTGRES_PASSWORD: shopping_cart
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shopping_cart -d shopping_cart"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  warehouse-db:
+    image: postgres:18-alpine
+    container_name: warehouse-db
+    ports:
+      - "5435:5432"
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: warehouse
+      POSTGRES_USER: warehouse
+      POSTGRES_PASSWORD: warehouse
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U warehouse -d warehouse"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   kafka:
     image: confluentinc/confluent-local:7.4.3
     hostname: kafka

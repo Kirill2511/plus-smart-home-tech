@@ -1,0 +1,24 @@
+@namespace("ru.yandex.practicum.kafka.telemetry.event")
+protocol SensorsSnapshotProtocol {
+
+    import idl "../SensorEvent.avdl";
+
+    record SensorsSnapshotAvro {
+        string hubId;
+        @logicalType("timestamp-millis")
+        long timestamp;
+        map<SensorStateAvro> sensorsState;
+    }
+
+    record SensorStateAvro {
+        @logicalType("timestamp-millis")
+        long timestamp;
+        union {
+            ClimateSensorAvro,
+            LightSensorAvro,
+            MotionSensorAvro,
+            SwitchSensorAvro,
+            TemperatureSensorAvro
+        } data;
+    }
+}
