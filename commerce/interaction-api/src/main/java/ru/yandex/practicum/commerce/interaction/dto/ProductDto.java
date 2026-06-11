@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.yandex.practicum.commerce.interaction.enums.ProductCategory;
 import ru.yandex.practicum.commerce.interaction.enums.ProductState;
-import ru.yandex.practicum.commerce.interaction.enums.QuantityState;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -30,7 +29,7 @@ public class ProductDto {
     private String imageSrc;
 
     @NotNull
-    private QuantityState quantityState;
+    private String quantityState;
 
     @NotNull
     private ProductState productState;

@@ -1,0 +1,16 @@
+server:
+  port: 0
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5438/delivery
+    driver-class-name: org.postgresql.Driver
+    username: delivery
+    password: delivery
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true

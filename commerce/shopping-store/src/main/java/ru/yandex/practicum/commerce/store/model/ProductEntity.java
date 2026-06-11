@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.yandex.practicum.commerce.interaction.enums.ProductCategory;
 import ru.yandex.practicum.commerce.interaction.enums.ProductState;
-import ru.yandex.practicum.commerce.interaction.enums.QuantityState;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -33,9 +32,8 @@ public class ProductEntity {
 
     private String imageSrc;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private QuantityState quantityState;
+    private String quantityState;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

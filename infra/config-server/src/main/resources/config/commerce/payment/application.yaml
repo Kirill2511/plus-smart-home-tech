@@ -1,0 +1,16 @@
+server:
+  port: 0
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5437/payment
+    driver-class-name: org.postgresql.Driver
+    username: payment
+    password: payment
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true

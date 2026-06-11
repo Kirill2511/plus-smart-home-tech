@@ -6,12 +6,12 @@ spring:
   cloud:
     config:
       fail-fast: true
+      uri: http://localhost:8888
       retry:
         useRandomPolicy: true
         max-interval: 6000
       discovery:
-        enabled: true
-        serviceId: config-server
+        enabled: false
 
 eureka:
   client:

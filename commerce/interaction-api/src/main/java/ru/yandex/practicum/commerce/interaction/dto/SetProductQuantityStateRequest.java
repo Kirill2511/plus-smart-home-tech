@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.yandex.practicum.commerce.interaction.enums.QuantityState;
 
 import java.util.UUID;
 
@@ -16,5 +15,5 @@ public class SetProductQuantityStateRequest {
     private UUID productId;
 
     @NotNull
-    private QuantityState quantityState;
+    private String quantityState;
 }
