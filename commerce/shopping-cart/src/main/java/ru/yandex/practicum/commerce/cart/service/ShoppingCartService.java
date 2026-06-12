@@ -95,13 +95,17 @@ public class ShoppingCartService {
 
     private void checkWarehouse(ShoppingCartEntity cart) {
         ShoppingCartDto cartDto = toDto(cart);
-        try {
-            warehouseClient.checkProductQuantityEnoughForShoppingCart(cartDto);
-        } catch (FeignException.BadRequest exception) {
-            throw new CartException("Product quantity is not enough in warehouse", HttpStatus.BAD_REQUEST);
-        } catch (RuntimeException exception) {
-            checkWarehouseThroughDiscovery(cartDto);
+        for (int attempt = 0; attempt < 5; attempt++) {
+            try {
+                warehouseClient.checkProductQuantityEnoughForShoppingCart(cartDto);
+                return;
+            } catch (FeignException.BadRequest exception) {
+                throw new CartException("Product quantity is not enough in warehouse", HttpStatus.BAD_REQUEST);
+            } catch (RuntimeException exception) {
+                sleepBeforeRetry();
+            }
         }
+        checkWarehouseThroughDiscovery(cartDto);
     }
 
     private void checkWarehouseThroughDiscovery(ShoppingCartDto cartDto) {

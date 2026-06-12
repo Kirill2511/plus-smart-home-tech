@@ -63,6 +63,54 @@ services:
       timeout: 5s
       retries: 10
 
+  order-db:
+    image: postgres:18-alpine
+    container_name: order-db
+    ports:
+      - "5436:5432"
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: orders
+      POSTGRES_USER: orders
+      POSTGRES_PASSWORD: orders
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U orders -d orders"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  payment-db:
+    image: postgres:18-alpine
+    container_name: payment-db
+    ports:
+      - "5437:5432"
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: payment
+      POSTGRES_USER: payment
+      POSTGRES_PASSWORD: payment
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U payment -d payment"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  delivery-db:
+    image: postgres:18-alpine
+    container_name: delivery-db
+    ports:
+      - "5438:5432"
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: delivery
+      POSTGRES_USER: delivery
+      POSTGRES_PASSWORD: delivery
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U delivery -d delivery"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   kafka:
     image: confluentinc/confluent-local:7.4.3
     hostname: kafka

@@ -11,7 +11,6 @@ import ru.yandex.practicum.commerce.interaction.client.ShoppingStoreClient;
 import ru.yandex.practicum.commerce.interaction.dto.ProductDto;
 import ru.yandex.practicum.commerce.interaction.dto.SetProductQuantityStateRequest;
 import ru.yandex.practicum.commerce.interaction.enums.ProductCategory;
-import ru.yandex.practicum.commerce.interaction.enums.QuantityState;
 import ru.yandex.practicum.commerce.store.service.ProductService;
 
 import java.util.List;
@@ -49,7 +48,7 @@ public class ShoppingStoreController implements ShoppingStoreClient {
 
     @PostMapping(value = "/api/v1/shopping-store/quantityState", params = {"productId", "quantityState"})
     public Boolean setProductQuantityState(@RequestParam UUID productId,
-                                           @RequestParam QuantityState quantityState) {
+                                           @RequestParam String quantityState) {
         return service.setQuantityState(new SetProductQuantityStateRequest(productId, quantityState));
     }
 
