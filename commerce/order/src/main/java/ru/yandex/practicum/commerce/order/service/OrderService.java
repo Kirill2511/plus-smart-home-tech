@@ -28,7 +28,6 @@ public class OrderService {
     private final DeliveryClient deliveryClient;
     private final PaymentClient paymentClient;
 
-    @Transactional(readOnly = true)
     public List<OrderDto> getClientOrders(String username) {
         List<OrderEntity> orders = StringUtils.hasText(username)
                 ? repository.findAllByUsername(username)

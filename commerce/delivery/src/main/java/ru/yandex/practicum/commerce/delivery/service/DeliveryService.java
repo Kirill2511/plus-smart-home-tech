@@ -1,6 +1,7 @@
 package ru.yandex.practicum.commerce.delivery.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ import java.math.RoundingMode;
 import java.util.UUID;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class DeliveryService {
     private static final BigDecimal BASE_COST = new BigDecimal("5.0");
@@ -48,26 +50,52 @@ public class DeliveryService {
         return toDto(repository.save(delivery));
     }
 
-    @Transactional(readOnly = true)
     public BigDecimal calculateCost(OrderDto order) {
         validateOrder(order);
+        log.info("Calculating delivery cost for orderId={}, deliveryId={}, fragile={}, weight={}, volume={}",
+                order.getOrderId(), order.getDeliveryId(), order.getFragile(),
+                order.getDeliveryWeight(), order.getDeliveryVolume());
+
         DeliveryEntity delivery = order.getDeliveryId() == null
                 ? null
                 : repository.findById(order.getDeliveryId()).orElse(null);
 
         AddressDto fromAddress = delivery == null ? warehouseClient.getWarehouseAddress() : toDto(delivery.getFromAddress());
         AddressDto toAddress = delivery == null ? null : toDto(delivery.getToAddress());
+        log.info("Delivery cost addresses for orderId={}: fromAddress={}, toAddress={}",
+                order.getOrderId(), fromAddress, toAddress);
 
-        BigDecimal result = BASE_COST.add(BASE_COST.multiply(BigDecimal.valueOf(addressMultiplier(fromAddress))));
+        int addressMultiplier = addressMultiplier(fromAddress);
+        BigDecimal addressMultiplierCost = BASE_COST.multiply(BigDecimal.valueOf(addressMultiplier));
+        BigDecimal result = BASE_COST.add(addressMultiplierCost);
+
+        BigDecimal fragileCost = BigDecimal.ZERO;
         if (Boolean.TRUE.equals(order.getFragile())) {
-            result = result.add(result.multiply(FRAGILE_RATE));
+            fragileCost = result.multiply(FRAGILE_RATE);
+            result = result.add(fragileCost);
         }
-        result = result.add(BigDecimal.valueOf(defaultDouble(order.getDeliveryWeight())).multiply(WEIGHT_RATE));
-        result = result.add(BigDecimal.valueOf(defaultDouble(order.getDeliveryVolume())).multiply(VOLUME_RATE));
-        if (!sameStreet(fromAddress, toAddress)) {
-            result = result.add(result.multiply(ADDRESS_RATE));
+
+        BigDecimal weightCost = BigDecimal.valueOf(defaultDouble(order.getDeliveryWeight())).multiply(WEIGHT_RATE);
+        result = result.add(weightCost);
+
+        BigDecimal volumeCost = BigDecimal.valueOf(defaultDouble(order.getDeliveryVolume())).multiply(VOLUME_RATE);
+        result = result.add(volumeCost);
+
+        boolean differentStreet = !sameStreet(fromAddress, toAddress);
+        BigDecimal differentStreetCost = BigDecimal.ZERO;
+        if (differentStreet) {
+            differentStreetCost = result.multiply(ADDRESS_RATE);
+            result = result.add(differentStreetCost);
         }
-        return result.setScale(2, RoundingMode.HALF_UP);
+
+        BigDecimal totalCost = result.setScale(2, RoundingMode.HALF_UP);
+        log.info("Delivery cost calculated for orderId={}: baseCost={}, addressMultiplier={}, "
+                        + "addressMultiplierCost={}, fragileRate={}, fragileCost={}, weightRate={}, weightCost={}, "
+                        + "volumeRate={}, volumeCost={}, differentStreet={}, addressRate={}, differentStreetCost={}, totalCost={}",
+                order.getOrderId(), BASE_COST, addressMultiplier, addressMultiplierCost,
+                FRAGILE_RATE, fragileCost, WEIGHT_RATE, weightCost, VOLUME_RATE, volumeCost,
+                differentStreet, ADDRESS_RATE, differentStreetCost, totalCost);
+        return totalCost;
     }
 
     @Transactional
